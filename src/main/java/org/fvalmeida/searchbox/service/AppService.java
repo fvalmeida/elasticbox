@@ -42,13 +42,7 @@ public class AppService {
             SAXException, TikaException {
 
         ParsingExample parsingExample = new ParsingExample();
-        System.out.println(parsingExample.parseToStringExample());
-        System.out.println(parsingExample.parseExample());
-        System.out.println(parsingExample.parseNoEmbeddedExample());
-        System.out.println(parsingExample.parseEmbeddedExample());
-        System.out.println(parsingExample.recursiveParserWrapperExample());
         System.out.println(parsingExample.serializedRecursiveParserWrapperExample());
-        System.out.println(parsingExample.extractEmbeddedDocumentsExample(new File(".").toPath()));
 
         return null;
     }

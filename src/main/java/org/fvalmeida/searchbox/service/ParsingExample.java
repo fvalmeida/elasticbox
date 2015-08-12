@@ -171,7 +171,7 @@ public class ParsingExample {
 
         Parser p = new AutoDetectParser();
         ContentHandlerFactory factory = new BasicContentHandlerFactory(
-                BasicContentHandlerFactory.HANDLER_TYPE.HTML, -1);
+                BasicContentHandlerFactory.HANDLER_TYPE.TEXT, -1);
 
         RecursiveParserWrapper wrapper = new RecursiveParserWrapper(p, factory);
         InputStream stream = new ClassPathResource("example/test_recursive_embedded.docx").getInputStream();

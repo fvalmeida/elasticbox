@@ -17,8 +17,10 @@ package org.fvalmeida.searchbox.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
@@ -99,7 +101,7 @@ public class ExtractEmbeddedFiles {
             Path outputFile = outputDir.resolve(name);
             //do a better job than this of checking
             Files.createDirectories(outputFile.getParent());
-            Files.copy(stream, outputFile);
+            Files.copy(stream, outputFile, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 }

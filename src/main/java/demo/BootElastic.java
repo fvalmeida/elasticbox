@@ -18,17 +18,20 @@ import java.util.List;
 /**
  * @author sezin karli
  * @since 2/28/15 1:56 PM
- *        User: Sezin Karli
+ * User: Sezin Karli
  */
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan
 public class BootElastic implements CommandLineRunner {
 
+    private static final Logger logger = LoggerFactory.getLogger(BootElastic.class);
     @Autowired
     private MovieService movieService;
 
-    private static final Logger logger = LoggerFactory.getLogger(BootElastic.class);
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(BootElastic.class, args);
+    }
 
     private void addSomeMovies() {
         Movie starWars = getFirstMovie();
@@ -80,9 +83,5 @@ public class BootElastic implements CommandLineRunner {
 
         List<Movie> byRatingInterval = movieService.getByRatingInterval(6d, 9d);
         logger.info("Content of Rating Interval query is {}", byRatingInterval);
-    }
-
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(BootElastic.class, args);
     }
 }

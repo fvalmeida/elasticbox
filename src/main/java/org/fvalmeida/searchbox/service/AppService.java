@@ -2,12 +2,11 @@ package org.fvalmeida.searchbox.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
-import org.apache.tika.metadata.ParentMetadata;
 import org.apache.tika.metadata.serialization.JsonMetadata;
-import org.apache.tika.metadata.serialization.JsonMetadataList;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
@@ -18,18 +17,17 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.Future;
 
 @Service
 @Slf4j
@@ -37,57 +35,44 @@ public class AppService {
 
     @Autowired
     private Client client;
-//
-//    @Autowired
-//    private ElasticsearchTemplate elasticsearchTemplate;
+
+    @Value("elasticsearch.index.name")
+    private String indexName;
 
     @PostConstruct
-    public void tikaIndexTest() {
-
+    public void init() {
         try {
-            ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
-            Resource[] tikaFiles = patternResolver.getResources("classpath*:tika/**");
-
-            try {
-                client.admin().indices().prepareCreate("playground").get();
-            } catch (IndexAlreadyExistsException ignored) {
-            }
-
-            for (Resource tikaFile : tikaFiles) {
-                parse(tikaFile.getFile());
-            }
-        } catch (Exception e) {
-            log.error("{}", e);
+            client.admin().indices().prepareCreate(indexName).get();
+        } catch (IndexAlreadyExistsException ignored) {
         }
-
     }
 
-    private void parse(File file) throws TikaException, IOException, SAXException {
+    @Async
+    public Future<List<Pair<String, IndexResponse>>> parse(File file) throws TikaException, IOException, SAXException {
+        List<Pair<String, IndexResponse>> pairs = new ArrayList<>();
         List<Metadata> metadatas = getMetadata(file);
         if (metadatas.size() > 1) {
-            ParentMetadata parentMetadata = (ParentMetadata) metadatas.get(0);
-            parentMetadata.setEmbeddedMetadatas(metadatas.subList(1, metadatas.size()));
-
-            Map<String, Object> metadataMap = new HashMap<String, Object>();
-            metadataMap.put("", metadatas.get(0));
-//            metadataMap.put("embeddedFiles", );
+            Metadata parentMetadata = metadatas.get(0);
+            pairs.add(store(metadatas.get(0), DigestUtils.sha256Hex(new FileInputStream(file))));
+            for (int i = 1; i < metadatas.size(); i++) {
+                Metadata metadata = metadatas.get(i);
+                metadata.set("resourceName", parentMetadata.get("resourceName"));
+                store(metadata, String.format("%s-%s", DigestUtils.sha256Hex(new FileInputStream(file)), i));
+            }
         } else {
-            store(metadatas.get(0), DigestUtils.sha256Hex(new FileInputStream(file)));
+            pairs.add(store(metadatas.get(0), DigestUtils.sha256Hex(new FileInputStream(file))));
         }
+        return new AsyncResult<>(pairs);
     }
 
-    private void store(Metadata metadata, String id) throws TikaException {
+    private Pair<String, IndexResponse> store(Metadata metadata, String id) throws TikaException {
         StringWriter writer = new StringWriter();
         JsonMetadata.toJson(metadata, writer);
-
-//        JsonMetadataList.toJson();
-
-        log.info(writer.toString());
-        IndexResponse response = client.prepareIndex("playground", "tikametadata", id)
+        IndexResponse response = client.prepareIndex(indexName, Metadata.class.getName(), id)
                 .setSource(writer.toString())
                 .execute()
                 .actionGet();
-        log.info(ToStringBuilder.reflectionToString(response));
+        return new ImmutablePair<>(writer.toString(), response);
     }
 
     /**
@@ -113,7 +98,7 @@ public class AppService {
      * @throws SAXException
      * @throws TikaException
      */
-    public List<Metadata> getMetadata(File file) throws IOException, SAXException, TikaException {
+    private List<Metadata> getMetadata(File file) throws IOException, SAXException, TikaException {
         Parser p = new AutoDetectParser();
         ContentHandlerFactory factory = new BasicContentHandlerFactory(BasicContentHandlerFactory.HANDLER_TYPE.TEXT, -1);
         RecursiveParserWrapper wrapper = new RecursiveParserWrapper(p, factory);
@@ -122,41 +107,11 @@ public class AppService {
         metadata.set(Metadata.RESOURCE_NAME_KEY, file.getName());
         ParseContext context = new ParseContext();
         try {
-            wrapper.parse(stream, new DefaultHandler(), metadata, context);
+            wrapper.parse(stream, null, metadata, context);
         } finally {
             stream.close();
         }
         return wrapper.getMetadata();
     }
 
-//    public void indexJokes() throws Exception {
-//        // create an index name "jokes" to store the jokes in
-//        try {
-//            client.admin().indices().prepareCreate("jokes").get();
-//        } catch (IndexAlreadyExistsException ignored) {
-//        }
-//
-//        storeJoke(1, "Why are teddy bears never hungry? ", "They are always stuffed!");
-//        storeJoke(2, "Where do polar bears vote? ", "The North Poll!");
-//    }
-//
-//    private void storeJoke(int id, String question, String answer) throws IOException {
-//        // index a document ID  of type "joke" in the "jokes" index
-//        client.prepareIndex("jokes", "joke", String.valueOf(id))
-//                .setSource(
-//                        XContentFactory.jsonBuilder()
-//                                .startObject()
-//                                .field("question", question)
-//                                .field("answer", answer)
-//                                .endObject()
-//                )
-//                .get();
-//    }
-//
-//    public SearchHit[] search(String query) {
-//        return client.prepareSearch("jokes")
-//                .setTypes("joke")
-//                .setQuery(QueryBuilders.multiMatchQuery(query, "question", "answer"))
-//                .get().getHits().getHits();
-//    }
 }

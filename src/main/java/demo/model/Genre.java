@@ -3,7 +3,7 @@ package demo.model;
 /**
  * @author sezin karli
  * @since 2/28/15 1:56 PM
- *        User: Sezin Karli
+ * User: Sezin Karli
  */
 public class Genre {
     private String name;
@@ -19,14 +19,14 @@ public class Genre {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public String toString() {
         return "Genre{" +
                 "name='" + name + '\'' +
                 '}';
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

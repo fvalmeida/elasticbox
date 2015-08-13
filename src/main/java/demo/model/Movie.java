@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author sezin karli
  * @since 2/28/15 1:56 PM
- *        User: Sezin Karli
+ * User: Sezin Karli
  */
 
 @Document(indexName = "elastic_sample", type = "movie")
@@ -34,10 +34,6 @@ public class Movie {
         this.rating = rating;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public List<Genre> getGenre() {
         return genre;
     }
@@ -48,6 +44,10 @@ public class Movie {
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {

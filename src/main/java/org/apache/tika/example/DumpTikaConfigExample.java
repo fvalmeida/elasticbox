@@ -16,27 +16,6 @@ package org.apache.tika.example;
  * limitations under the License.
  */
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
@@ -52,6 +31,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.*;
+
 
 /**
  * This class shows how to dump a TikaConfig object to a configuration file.
@@ -66,7 +56,34 @@ import org.w3c.dom.Node;
 public class DumpTikaConfigExample {
 
     /**
-     *
+     * @param args outputFile, outputEncoding, if args is empty, this prints to console
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+
+        Charset encoding = IOUtils.UTF_8;
+        Writer writer = null;
+        if (args.length > 0) {
+            writer = new OutputStreamWriter(new FileOutputStream(new File(args[0])), encoding);
+        } else {
+            writer = new StringWriter();
+        }
+
+        if (args.length > 1) {
+            encoding = Charset.forName(args[1]);
+        }
+        DumpTikaConfigExample ex = new DumpTikaConfigExample();
+        ex.dump(TikaConfig.getDefaultConfig(), writer, encoding.name());
+
+        writer.flush();
+
+        if (writer instanceof StringWriter) {
+            System.out.println(writer.toString());
+        }
+        writer.close();
+    }
+
+    /**
      * @param config config file to dump
      * @param writer writer to which to write
      * @throws Exception
@@ -103,7 +120,7 @@ public class DumpTikaConfigExample {
         Translator translator = config.getTranslator();
         if (translator instanceof DefaultTranslator) {
             Node mimeComment = doc.createComment(
-                    "for example: "+
+                    "for example: " +
                             "<translator class=\"org.apache.tika.language.translate.GoogleTranslator\"/>");
             rootElement.appendChild(mimeComment);
         } else {
@@ -124,7 +141,7 @@ public class DumpTikaConfigExample {
         Element detectorsElement = doc.createElement("detectors");
 
         if (detector instanceof DefaultDetector) {
-            List<Detector> children = ((DefaultDetector)detector).getDetectors();
+            List<Detector> children = ((DefaultDetector) detector).getDetectors();
             for (Detector d : children) {
                 Element detectorElement = doc.createElement("detector");
                 detectorElement.setAttribute("class", d.getClass().getCanonicalName());
@@ -148,7 +165,7 @@ public class DumpTikaConfigExample {
             parserElement.setAttribute("class", className);
             Set<MediaType> types = new TreeSet<MediaType>();
             types.addAll(child.getSupportedTypes(context));
-            for (MediaType type : types){
+            for (MediaType type : types) {
                 Element mimeElement = doc.createElement("mime");
                 mimeElement.appendChild(doc.createTextNode(type.toString()));
                 parserElement.appendChild(mimeElement);
@@ -159,10 +176,10 @@ public class DumpTikaConfigExample {
 
     }
 
-    private Map<String, Parser> getConcreteParsers(Parser parentParser)throws TikaException, IOException  {
+    private Map<String, Parser> getConcreteParsers(Parser parentParser) throws TikaException, IOException {
         Map<String, Parser> parsers = new TreeMap<String, Parser>();
         if (parentParser instanceof CompositeParser) {
-            addParsers((CompositeParser)parentParser, parsers);
+            addParsers((CompositeParser) parentParser, parsers);
         } else {
             addParser(parentParser, parsers);
         }
@@ -172,7 +189,7 @@ public class DumpTikaConfigExample {
     private void addParsers(CompositeParser p, Map<String, Parser> parsers) {
         for (Parser child : p.getParsers().values()) {
             if (child instanceof CompositeParser) {
-                addParsers((CompositeParser)child, parsers);
+                addParsers((CompositeParser) child, parsers);
             } else {
                 addParser(child, parsers);
             }
@@ -181,34 +198,5 @@ public class DumpTikaConfigExample {
 
     private void addParser(Parser p, Map<String, Parser> parsers) {
         parsers.put(p.getClass().getCanonicalName(), p);
-    }
-
-    /**
-     *
-     * @param args outputFile, outputEncoding, if args is empty, this prints to console
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-
-        Charset encoding = IOUtils.UTF_8;
-        Writer writer = null;
-        if (args.length > 0) {
-            writer = new OutputStreamWriter(new FileOutputStream(new File(args[0])), encoding);
-        } else {
-            writer = new StringWriter();
-        }
-
-        if (args.length > 1) {
-            encoding = Charset.forName(args[1]);
-        }
-        DumpTikaConfigExample ex = new DumpTikaConfigExample();
-        ex.dump(TikaConfig.getDefaultConfig(), writer, encoding.name());
-
-        writer.flush();
-
-        if (writer instanceof StringWriter) {
-            System.out.println(writer.toString());
-        }
-        writer.close();
     }
 }

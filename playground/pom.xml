@@ -40,6 +40,32 @@
 			<artifactId>tika-serialization</artifactId>
 			<version>1.10</version>
 		</dependency>
+		<!-- MUST BE REPLACED WITH USED TIKA DEPENDENCIES -->
+		<!--<dependency>-->
+			<!--<groupId>org.apache.tika</groupId>-->
+			<!--<artifactId>tika-example</artifactId>-->
+			<!--<version>1.10</version>-->
+			<!--<exclusions>-->
+				<!--<exclusion>-->
+					<!--<artifactId>lucene-core</artifactId>-->
+					<!--<groupId>org.apache.lucene</groupId>-->
+				<!--</exclusion>-->
+			<!--</exclusions>-->
+		<!--</dependency>-->
+
+		<!--<dependency>-->
+			<!--<groupId>org.apache.lucene</groupId>-->
+			<!--<artifactId>lucene-core</artifactId>-->
+			<!--<version>4.9.0</version>-->
+		<!--</dependency>-->
+
+		<!--<dependency>-->
+			<!--<groupId>org.apache.tika</groupId>-->
+			<!--<artifactId>tika-parsers</artifactId>-->
+			<!--<version>1.10</version>-->
+			<!--<type>test-jar</type>-->
+			<!--<scope>test</scope>-->
+		<!--</dependency>-->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -66,8 +92,6 @@
 	</dependencies>
 
 	<build>
-		<finalName>${project.artifactId}</finalName>
-
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

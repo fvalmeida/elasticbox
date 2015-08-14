@@ -50,19 +50,18 @@ public class Runner implements CommandLineRunner {
         }
     }
 
-    private void process(File file) throws RuntimeException {
-        log.info("Processing file: ".concat(file.getName()));
+    private void process(File file) {
         try {
             List<Future<List<Pair<String, IndexResponse>>>> futures = new ArrayList<>();
             futures.add(indexer.store(extractor.parse(file)));
             for (Future<List<Pair<String, IndexResponse>>> future : futures) {
                 for (Pair<String, IndexResponse> pair : future.get()) {
-                    log.debug(String.format("File: %s\nParsed content:\n%s", file.getName(), pair.getLeft()));
-                    log.info(String.format("File: %s\n%s",file.getName(), ToStringBuilder.reflectionToString(pair.getRight())));
+                    log.debug(String.format("File: %s\nParsed content:\n%s", file.getAbsolutePath(), pair.getLeft()));
+                    log.info(String.format("File: %s\n%s",file.getAbsolutePath(), ToStringBuilder.reflectionToString(pair.getRight())));
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("File: {}\n{}", file.getAbsolutePath(), e);
         }
     }
 

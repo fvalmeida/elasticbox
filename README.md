@@ -1,5 +1,4 @@
-# my-search-box
+# searchbox
 
-to test with Chrome use this JVM parameters
-    -Dbrowser=chrome -Dwebdriver.chrome.driver=/path/to/your/chromedriver
-        eg.: /Users/fvalmeida/Downloads/chromedriver
+- to run unit tests using Chrome put this JVM parameters "-Dbrowser=chrome -Dwebdriver.chrome.driver=/path/to/your/chromedriver"
+    - eg.: /Users/fvalmeida/Downloads/chromedriver

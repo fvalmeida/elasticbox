@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -33,16 +35,28 @@ public class Extractor {
         List<Metadata> metadatas = getMetadata(file);
         if (metadatas.size() > 1) {
             Metadata parentMetadata = metadatas.get(0);
-            pairs.add(new ImmutablePair<>(metadatas.get(0), DigestUtils.sha256Hex(new FileInputStream(file))));
+            pairs.add(new ImmutablePair<>(
+                    addPath(metadatas.get(0), file),
+                    DigestUtils.sha256Hex(new FileInputStream(file))));
             for (int i = 1; i < metadatas.size(); i++) {
                 Metadata metadata = metadatas.get(i);
                 metadata.set("resourceName", parentMetadata.get("resourceName"));
-                pairs.add(new ImmutablePair<>(metadata, String.format("%s-%s", DigestUtils.sha256Hex(new FileInputStream(file)), i)));
+                pairs.add(new ImmutablePair<>(
+                        addPath(metadata, file),
+                        String.format("%s-%s", DigestUtils.sha256Hex(new FileInputStream(file)), i)));
             }
         } else {
-            pairs.add(new ImmutablePair<>(metadatas.get(0), DigestUtils.sha256Hex(new FileInputStream(file))));
+            pairs.add(new ImmutablePair<>(
+                    addPath(metadatas.get(0), file),
+                    DigestUtils.sha256Hex(new FileInputStream(file))));
         }
         return new AsyncResult<>(pairs);
+    }
+
+    private Metadata addPath(Metadata metadata, File file)  {
+        Path path = Paths.get(file.getAbsolutePath());
+        metadata.add("path", path.getParent().toString());
+        return metadata;
     }
 
     private List<Metadata> getMetadata(File file) throws IOException, SAXException, TikaException {

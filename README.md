@@ -28,6 +28,12 @@ cd elasticbox
 mvn clean package
 ```
 
+Running
+------------
+
+java -jar target/elasticbox-tika-indexer.jar --paths="/Users/fvalmeida/Documents" --index.name="documents"
+
+
 <!---
 - to run unit tests using Chrome put this JVM parameters "-Dbrowser=chrome -Dwebdriver.chrome.driver=/path/to/your/chromedriver"
     - eg.: /Users/fvalmeida/Downloads/chromedriver

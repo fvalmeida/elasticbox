@@ -33,8 +33,23 @@ public class Runner implements CommandLineRunner {
     @Value("${recursively:true}")
     private boolean recursively;
 
+//    private static Options getOptions() {
+//        final Options options = new Options();
+//        options.addOption(Option.builder("h").longOpt("help").desc("Print this help message").build());
+//        options.addOption(Option.builder("paths").desc("Comma-separated paths for index to Elasticsearch (Default: current directory)").build());
+//        options.addOption(Option.builder("index.name").desc("Elasticsearch index name (Default: elasticbox)").build());
+//        return options;
+//    }
+
     public void run(String... args) {
         try {
+//            CommandLineParser parser = new DefaultParser() ;
+//            CommandLine cmd = parser.parse(getOptions(), args);
+
+//            if( cmd.hasOption( "h" ) ) {
+//                HelpFormatter formatter = new HelpFormatter();
+//                formatter.printHelp("java -jar elasticbox-tika-indexer.jar", getOptions());
+//            } else {
             for (String path : paths) {
                 if (recursively) {
                     Files.walk(Paths.get(path))
@@ -45,8 +60,15 @@ public class Runner implements CommandLineRunner {
                             .stream().forEach(this::process);
                 }
             }
+//            }
         } catch (Exception e) {
+//            if (e instanceof ParseException) {
+//                HelpFormatter formatter = new HelpFormatter();
+//                log.error(e.getMessage());
+//                formatter.printHelp("java -jar elasticbox-tika-indexer.jar", getOptions());
+//            } else {
             log.error("{}", e);
+//            }
         }
     }
 
@@ -57,12 +79,11 @@ public class Runner implements CommandLineRunner {
             for (Future<List<Pair<String, IndexResponse>>> future : futures) {
                 for (Pair<String, IndexResponse> pair : future.get()) {
                     log.debug(String.format("File: %s\nParsed content:\n%s", file.getAbsolutePath(), pair.getLeft()));
-                    log.info(String.format("File: %s\n%s",file.getAbsolutePath(), ToStringBuilder.reflectionToString(pair.getRight())));
+                    log.info(String.format("File: %s\n%s", file.getAbsolutePath(), ToStringBuilder.reflectionToString(pair.getRight())));
                 }
             }
         } catch (Exception e) {
             log.error("File: {}\n{}", file.getAbsolutePath(), e);
         }
     }
-
 }

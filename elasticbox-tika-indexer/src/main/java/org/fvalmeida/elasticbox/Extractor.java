@@ -54,7 +54,7 @@ public class Extractor {
         return new AsyncResult<>(pairs);
     }
 
-    private Metadata addPath(Metadata metadata, File file)  {
+    private Metadata addPath(Metadata metadata, File file) {
         Path path = Paths.get(file.getAbsolutePath());
         FileSystemView fileSystemView = FileSystemView.getFileSystemView();
         metadata.add("resourceRoot", fileSystemView.getSystemDisplayName(Paths.get(file.getAbsolutePath()).getRoot().toFile()));

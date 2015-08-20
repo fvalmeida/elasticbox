@@ -43,4 +43,5 @@ Running
         ```bash
         java -jar elasticbox-tika-indexer.jar --paths=/Users/fvalmeida/Documents
         ```
+
     > For help, just run `java -jar elasticbox-tika-indexer.jar -?`

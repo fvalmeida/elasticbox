@@ -25,16 +25,22 @@ Installation
 ```bash
 git clone https://github.com/fvalmeida/elasticbox.git
 cd elasticbox
-mvn clean package
+mvn package
 ```
 
 Running
 ------------
 
-java -jar target/elasticbox-tika-indexer.jar --paths="/Users/fvalmeida/Documents" --index.name="documents"
-
-
-<!---
-- to run unit tests using Chrome put this JVM parameters "-Dbrowser=chrome -Dwebdriver.chrome.driver=/path/to/your/chromedriver"
-    - eg.: /Users/fvalmeida/Downloads/chromedriver
--->
+1. After build, copy target directory content to your desired installation path
+2. From **elasticsearch** directory, start it
+    Run `bin/elasticsearch` on Unix or `bin/elasticsearch.bat` on Windows
+3. There are many ways to index files:
+    - Copy **elasticbox-tika-indexer.jar** to desired path that will be indexed and run it
+        ```bash
+        java -jar elasticbox-tika-indexer.jar
+        ```
+    - From installation path run **elasticbox-tika-indexer.jar** with `paths` argument
+        ```bash
+        java -jar elasticbox-tika-indexer.jar --paths=/Users/fvalmeida/Documents
+        ```
+    > For help, just run `java -jar elasticbox-tika-indexer.jar -?`

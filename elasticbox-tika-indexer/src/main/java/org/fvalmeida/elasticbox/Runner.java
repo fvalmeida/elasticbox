@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +33,14 @@ public class Runner implements CommandLineRunner {
 
     private AtomicInteger totalCountFiles = new AtomicInteger();
 
-    public void run(String... args) {
+    public void run(String... args) throws IOException, InterruptedException {
         try {
             List<Future<Void>> futures = new ArrayList<>();
 
             monitor.start();
 
             for (String path : paths) {
-                log.info("Counting files from current start path: ".concat(path));
+                log.info(String.format("Counting files from current start path (may take a long time): %s", path));
                 if (recursive) {
                     Utils.list(Paths.get(path)).forEach(file -> totalCountFiles.incrementAndGet());
                     monitor.setTotalCountFiles(totalCountFiles.get()).setShow(true);
@@ -74,6 +75,7 @@ public class Runner implements CommandLineRunner {
             monitor.setRunning(false);
         } catch (Exception e) {
             log.error("{}", e);
+            throw e;
         }
     }
 

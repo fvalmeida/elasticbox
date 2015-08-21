@@ -35,7 +35,7 @@ public class FunctionVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException e) {
-        log.error("{}", e);
+        log.debug("{}", e);
         return CONTINUE;
     }
 

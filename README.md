@@ -56,4 +56,29 @@ Running
         java -jar elasticbox-tika-indexer.jar --paths=/Users/fvalmeida/Documents
         ```
 
-    > For help, just run `java -jar elasticbox-tika-indexer.jar -?`
+    > Usage: 
+    
+    ```bash
+    java -jar elasticbox-tika-indexer.jar <options>           
+      
+      Option                                                                 Description                     
+      ------                                                                 -----------                     
+      -?, -h, --help                                                         Show the help                   
+      --index.name=<value>                                                   Elasticsearch index name        
+                                                                              (default: elasticbox)          
+      --paths=<comma-separated paths>                                        Paths for index to Elasticsearch
+                                                                              (default: current directory)   
+      --recursive=<true|false>                                               Index path recursively          
+                                                                              (default: true)                
+      --spring.data.elasticsearch.cluster-nodes=<comma-separated nodes>      Elasticsearch cluster nodes     
+                                                                              (default: localhost:9300)      
+      --thread-count=<number of threads>                                     Max number of threads           
+                                                                              (default: 10)                  
+      --error.logging.file=<value>                                           Error logging file              
+                                                                              (default: elasticbox.error.log)
+      
+      Example:                                                           
+         java -jar elasticbox-tika-indexer.jar
+         java -jar elasticbox-tika-indexer.jar --recursive=false
+         java -jar elasticbox-tika-indexer.jar --paths=/Documents --index.name=documents
+   ```  

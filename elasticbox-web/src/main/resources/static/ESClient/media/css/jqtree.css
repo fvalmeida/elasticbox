@@ -14,6 +14,7 @@ ul.jqtree-tree ul.jqtree_common {
     margin-left: 12px;
     margin-right: 0;
 }
+
 ul.jqtree-tree li.jqtree-closed > ul.jqtree_common {
     display: none;
 }
@@ -22,15 +23,16 @@ ul.jqtree-tree li.jqtree_common {
     clear: both;
     list-style-type: none;
 }
+
 ul.jqtree-tree .jqtree-toggler {
     display: block;
     position: absolute;
     left: -1.5em;
     top: 30%;
-    *top: 0;  /* fix for ie7 */
+    *top: 0; /* fix for ie7 */
     font-size: 12px;
     line-height: 12px;
-    font-family: arial;  /* fix for ie9 */
+    font-family: arial; /* fix for ie9 */
     border-bottom: none;
     color: #333;
 }

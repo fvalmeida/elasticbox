@@ -5,15 +5,12 @@ import org.fvalmeida.elasticbox.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
-import java.util.function.Predicate;
 
 @Component
 @Slf4j
@@ -25,15 +22,15 @@ public class Runner implements CommandLineRunner {
     @Value("${paths:.}")
     private String[] paths;
 
-    @Value("${recursively:true}")
-    private boolean recursively;
+    @Value("${recursive:true}")
+    private boolean recursive;
 
     public void run(String... args) {
         try {
             List<Future<Void>> futures = new ArrayList<>();
 
             for (String path : paths) {
-                if (recursively) {
+                if (recursive) {
                     Utils.list(Paths.get(path))
 //                    Files.walk(Paths.get(path))
 //                            .filter(Files::isRegularFile)

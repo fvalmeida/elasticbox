@@ -1,6 +1,7 @@
 package org.fvalmeida.elasticbox;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import joptsimple.HelpFormatter;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -18,7 +19,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -38,6 +38,7 @@ public class Application {
 
     public static void main(String[] args) throws IOException {
         OptionParser parser = getOptionParse();
+        parser.formatHelpWith(getHelpFormatter());
         try {
             OptionSet options = parser.parse(args);
             if (options.has("?")) {
@@ -45,28 +46,22 @@ public class Application {
             } else {
                 SpringApplication.run(Application.class, args);
             }
-        } catch (OptionException e)  {
+        } catch (OptionException e) {
             log.error(e.getMessage());
             parser.printHelpOn(System.out);
         }
     }
 
-    private static OptionParser getOptionParse() {
+    protected static OptionParser getOptionParse() {
         final OptionParser parser = new OptionParser();
-        parser.formatHelpWith(options -> (
-                        "Usage: java -jar elasticbox-tika-indexer.jar <options>           \n\n" +
-                        "Option                           Description                       \n" +
-                        "------                           -----------                       \n" +
-                        "-?, -h, --help                   Show the help                     \n" +
-                        "--index.name=<value>             Elasticsearch index name          \n" +
-                        "                                  (default: elasticbox)            \n" +
-                        "--paths=<comma-separated paths>  Paths for index to Elasticsearch  \n" +
-                        "                                  (default: current directory)   \n\n" +
-                        "Example:                                                           \n" +
-                        "   java -jar elasticbox-tika-indexer.jar --paths=/Documents --index.name=documents\n\n"
-        ));
 
         parser.acceptsAll(asList("?", "h", "help"), "Show the help");
+
+        parser.acceptsAll(asList("index.name"), "Elasticsearch index name\n")
+                .withRequiredArg()
+                .ofType(String.class)
+                .defaultsTo("elasticbox")
+                .describedAs("value");
 
         parser.acceptsAll(asList("paths"), "Paths for index to Elasticsearch\n")
                 .withRequiredArg()
@@ -75,13 +70,57 @@ public class Application {
                 .defaultsTo("current directory")
                 .describedAs("comma-separated paths");
 
-        parser.acceptsAll(asList("index.name"), "Elasticsearch index name\n")
+        parser.acceptsAll(asList("recursive"), "Index path recursively\n")
+                .withRequiredArg()
+                .ofType(Boolean.class)
+                .defaultsTo(true)
+                .describedAs("true|false");
+
+        parser.acceptsAll(asList("thread-count"), "Max number of threads\n")
+                .withRequiredArg()
+                .ofType(Integer.class)
+                .defaultsTo(10)
+                .describedAs("number of threads");
+
+        parser.acceptsAll(asList("spring.data.elasticsearch.cluster-nodes"), "Elasticsearch cluster nodes\n")
                 .withRequiredArg()
                 .ofType(String.class)
-                .defaultsTo("elasticbox")
+                .withValuesSeparatedBy(",")
+                .defaultsTo("localhost:9300")
+                .describedAs("comma-separated nodes");
+
+        parser.acceptsAll(asList("error.logging.file"), "Error logging file\n")
+                .withRequiredArg()
+                .ofType(String.class)
+                .defaultsTo("elasticbox.error.log")
                 .describedAs("value");
 
         return parser;
+    }
+
+    private static HelpFormatter getHelpFormatter() {
+        return options -> (
+                "Usage: java -jar elasticbox-tika-indexer.jar <options>           \n\n" +
+                        "Option                                                                 Description                     \n" +
+                        "------                                                                 -----------                     \n" +
+                        "-?, -h, --help                                                         Show the help                   \n" +
+                        "--index.name=<value>                                                   Elasticsearch index name        \n" +
+                        "                                                                        (default: elasticbox)          \n" +
+                        "--paths=<comma-separated paths>                                        Paths for index to Elasticsearch\n" +
+                        "                                                                        (default: current directory)   \n" +
+                        "--recursive=<true|false>                                               Index path recursively          \n" +
+                        "                                                                        (default: true)                \n" +
+                        "--spring.data.elasticsearch.cluster-nodes=<comma-separated nodes>      Elasticsearch cluster nodes     \n" +
+                        "                                                                        (default: localhost:9300)      \n" +
+                        "--thread-count=<number of threads>                                     Max number of threads           \n" +
+                        "                                                                        (default: 10)                  \n" +
+                        "--error.logging.file=<value>                                           Error logging file              \n" +
+                        "                                                                        (default: elasticbox.error.log)\n\n" +
+                        "Example:                                                           \n" +
+                        "   java -jar elasticbox-tika-indexer.jar\n" +
+                        "   java -jar elasticbox-tika-indexer.jar --recursive=false\n" +
+                        "   java -jar elasticbox-tika-indexer.jar --paths=/Documents --index.name=documents\n\n"
+        );
     }
 
     private static List<String> asList(String... params) {

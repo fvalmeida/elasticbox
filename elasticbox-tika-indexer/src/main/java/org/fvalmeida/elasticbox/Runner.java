@@ -30,7 +30,7 @@ public class Runner implements CommandLineRunner {
     @Autowired
     private Monitor monitor;
 
-    private AtomicInteger totalCountFiles;
+    private AtomicInteger totalCountFiles = new AtomicInteger();
 
     public void run(String... args) {
         try {

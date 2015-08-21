@@ -21,11 +21,6 @@ public class WebApplication {
         return "redirect:/index.html";
     }
 
-    @RequestMapping("/HQ")
-    public String HQ() {
-        return "redirect:/HQ/index.html";
-    }
-
     @RequestMapping("/ESClient")
     public String ESClient() {
         return "redirect:/ESClient/index.html";

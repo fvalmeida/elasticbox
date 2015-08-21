@@ -5,6 +5,7 @@ import com.google.common.base.Function;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.EnumSet;
 import java.util.Objects;
 
 /**

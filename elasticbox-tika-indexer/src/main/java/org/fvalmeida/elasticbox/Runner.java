@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
@@ -29,6 +30,8 @@ public class Runner implements CommandLineRunner {
     @Autowired
     private Monitor monitor;
 
+    private AtomicInteger totalCountFiles;
+
     public void run(String... args) {
         try {
             List<Future<Void>> futures = new ArrayList<>();
@@ -36,9 +39,10 @@ public class Runner implements CommandLineRunner {
             monitor.start();
 
             for (String path : paths) {
-                log.info("Current start path: ".concat(path));
+                log.info("Counting files from current start path: ".concat(path));
                 if (recursive) {
-                    monitor.setTotalCountFiles(Utils.countFiles(Paths.get(path))).setShow(true);
+                    Utils.list(Paths.get(path)).forEach(file -> totalCountFiles.incrementAndGet());
+                    monitor.setTotalCountFiles(totalCountFiles.get()).setShow(true);
                     Utils.list(Paths.get(path))
 //                    Files.walk(Paths.get(path))
 //                            .filter(Files::isRegularFile)
@@ -46,8 +50,8 @@ public class Runner implements CommandLineRunner {
 //                                    .compare(o1.toFile(), o2.toFile()))
                             .forEach(file -> futures.add(processor.process(file.toFile())));
                 } else {
-
-                    monitor.setTotalCountFiles(Utils.countFiles(Paths.get(path), 1)).setShow(true);
+                    Utils.list(Paths.get(path), 1).forEach(file -> totalCountFiles.incrementAndGet());
+                    monitor.setTotalCountFiles(totalCountFiles.get()).setShow(true);
                     Utils.list(Paths.get(path), 1)
 //                    Arrays.asList(new File(path).listFiles(File::isFile))
 //                            .stream()

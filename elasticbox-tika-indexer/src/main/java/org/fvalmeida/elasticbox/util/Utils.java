@@ -17,35 +17,6 @@ public class Utils {
     }
 
     /**
-     * Count files of the directory structure, recursively
-     *
-     * @param target
-     * @param function
-     * @throws IOException
-     */
-    public static int countFiles(Path target) throws IOException {
-        validate(target);
-        CountFilesVisitor countFilesVisitor = new CountFilesVisitor();
-        Files.walkFileTree(target, countFilesVisitor);
-        return countFilesVisitor.nrOfFiles();
-    }
-
-    /**
-     * Count files of the directory structure, recursively
-     *
-     * @param target
-     * @param maxDepth
-     * @throws IOException
-     * @return
-     */
-    public static int countFiles(Path target, Integer maxDepth) throws IOException {
-        validate(target);
-        CountFilesVisitor countFilesVisitor = new CountFilesVisitor();
-        Files.walkFileTree(target, EnumSet.noneOf(FileVisitOption.class), maxDepth, countFilesVisitor);
-        return countFilesVisitor.nrOfFiles();
-    }
-
-    /**
      * Traverses the directory structure and applies the given function to each file
      *
      * @param target

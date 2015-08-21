@@ -19,6 +19,11 @@ public class CountFilesVisitor extends SimpleFileVisitor<Path> {
         return FileVisitResult.CONTINUE;
     }
 
+    @Override
+    public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+        return FileVisitResult.CONTINUE;
+    }
+
     public int nrOfFiles() {
         return nrOfFiles;
     }

@@ -20,7 +20,7 @@ public class WebApplication {
     public String index() {
         return "redirect:/index.html";
     }
-    
+
     @RequestMapping("/ESClient")
     public String ESClient() {
         return "redirect:/ESClient/index.html";

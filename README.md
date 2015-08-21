@@ -27,6 +27,11 @@ Technology stack
 + **Others**
     
     - [Elasticsearch.Net](http://nest.azurewebsites.net/)
+    - [Elasticsearch Indexing Performance Cheatsheet](https://blog.codecentric.de/en/2014/05/elasticsearch-indexing-performance-cheatsheet/)
+    - [exploring elasticsearch](http://exploringelasticsearch.com/)
+    - [Elasticsearch Cheat Sheet (1)](http://elasticsearch-cheatsheet.jolicode.com/)
+    - [Elasticsearch Cheat Sheet (2)](http://moliware.com/es-dsl-cheatsheet/)
+    - [Marvel](https://www.elastic.co/downloads/marvel)
 
 Installation
 ------------

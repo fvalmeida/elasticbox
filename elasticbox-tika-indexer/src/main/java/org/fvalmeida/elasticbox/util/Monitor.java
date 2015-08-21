@@ -40,7 +40,7 @@ public class Monitor extends Thread {
                 log.info(String.format(
                         "\n\n" +
                         "================================\n" +
-                        " Remaining files: %s / %s\n" +
+                        " Processed files: %s / %s\n" +
                         "================================\n", countFiles, totalCountFiles));
             }
             try {

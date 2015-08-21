@@ -5,6 +5,7 @@ import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -17,9 +18,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SpringBootApplication
 @EnableAsync
@@ -41,7 +45,7 @@ public class Application {
             } else {
                 SpringApplication.run(Application.class, args);
             }
-        } catch (OptionException e) {
+        } catch (OptionException e)  {
             log.error(e.getMessage());
             parser.printHelpOn(System.out);
         }
@@ -103,17 +107,24 @@ public class Application {
     }
 
     @Bean
-    public ConcurrentSkipListSet<String> checkSumFileSet() {
+    public ConcurrentSkipListSet<String> checkSumFileSet() throws IOException {
         File checkSumFile = new File(ELASTICBOX_TIKA_INDEXER_CHECKSUM_FILE);
+        ConcurrentSkipListSet<String> checkSumFileSet = new ConcurrentSkipListSet<>();
         if (checkSumFile.exists()) {
-            try {
-                return SerializationUtils.deserialize(Files.readAllBytes(checkSumFile.toPath()));
-            } catch (IOException e) {
-                log.error(e.getMessage());
-                log.warn("Loading .elasticbox-tika-indexer-checksum skipped!");
+            try (Stream<String> lines = Files.lines(checkSumFile.toPath())) {
+                checkSumFileSet = new ConcurrentSkipListSet<>(lines.collect(Collectors.toSet()));
+            } catch (Exception ex) {
+                log.warn("Trying load .elasticbox-tika-indexer-checksum with deserialization...");
+                try {
+                    checkSumFileSet = SerializationUtils.deserialize(Files.readAllBytes(checkSumFile.toPath()));
+                } catch (IOException ioe) {
+                    log.error(ioe.getMessage());
+                    log.warn(".elasticbox-tika-indexer-checksum was reset!");
+                }
             }
         }
-        return new ConcurrentSkipListSet<>();
+        FileUtils.writeLines(new File(Application.ELASTICBOX_TIKA_INDEXER_CHECKSUM_FILE), checkSumFileSet);
+        return checkSumFileSet;
     }
 
 }

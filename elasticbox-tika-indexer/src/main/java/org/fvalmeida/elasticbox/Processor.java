@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.action.index.IndexResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +59,8 @@ public class Processor {
 
     private void refreshCheckSumFileSet(String sha256) throws IOException {
         if (checkSumFileSet.add(sha256)) {
-            FileUtils.writeByteArrayToFile(
-                    new File(Application.ELASTICBOX_TIKA_INDEXER_CHECKSUM_FILE),
-                    SerializationUtils.serialize(checkSumFileSet));
+            FileUtils.write(new File(Application.ELASTICBOX_TIKA_INDEXER_CHECKSUM_FILE), sha256, true);
         }
     }
+
 }

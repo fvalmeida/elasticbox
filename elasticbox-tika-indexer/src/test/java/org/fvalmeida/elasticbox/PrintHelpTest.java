@@ -11,7 +11,7 @@ import java.io.IOException;
  * Created by fvalmeida on 8/21/15.
  */
 @RunWith(BlockJUnit4ClassRunner.class)
-public class PrintHelp {
+public class PrintHelpTest {
 
     @Test
     public void original() throws IOException {

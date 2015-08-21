@@ -1,6 +1,7 @@
 package org.fvalmeida.elasticbox;
 
 import lombok.extern.slf4j.Slf4j;
+import org.fvalmeida.elasticbox.util.Monitor;
 import org.fvalmeida.elasticbox.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,12 +26,19 @@ public class Runner implements CommandLineRunner {
     @Value("${recursive:true}")
     private boolean recursive;
 
+    @Autowired
+    private Monitor monitor;
+
     public void run(String... args) {
         try {
             List<Future<Void>> futures = new ArrayList<>();
 
+            monitor.start();
+
             for (String path : paths) {
+                log.info("Current start path: ".concat(path));
                 if (recursive) {
+                    monitor.setTotalCountFiles(Utils.countFiles(Paths.get(path))).setShow(true);
                     Utils.list(Paths.get(path))
 //                    Files.walk(Paths.get(path))
 //                            .filter(Files::isRegularFile)
@@ -38,11 +46,14 @@ public class Runner implements CommandLineRunner {
 //                                    .compare(o1.toFile(), o2.toFile()))
                             .forEach(file -> futures.add(processor.process(file.toFile())));
                 } else {
+
+                    monitor.setTotalCountFiles(Utils.countFiles(Paths.get(path), 1)).setShow(true);
                     Utils.list(Paths.get(path), 1)
 //                    Arrays.asList(new File(path).listFiles(File::isFile))
 //                            .stream()
 //                            .sorted(LastModifiedFileComparator.LASTMODIFIED_COMPARATOR)
                             .forEach(file -> futures.add(processor.process(file.toFile())));
+
                 }
             }
 
@@ -56,6 +67,7 @@ public class Runner implements CommandLineRunner {
                 Thread.sleep(10); //10-millisecond pause between each check
             }
 
+            monitor.setRunning(false);
         } catch (Exception e) {
             log.error("{}", e);
         }

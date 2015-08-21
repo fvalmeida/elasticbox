@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -164,6 +165,11 @@ public class Application {
         }
         FileUtils.writeLines(new File(Application.ELASTICBOX_TIKA_INDEXER_CHECKSUM_FILE), checkSumFileSet);
         return checkSumFileSet;
+    }
+
+    @Bean
+    public AtomicInteger countFiles() {
+        return new AtomicInteger();
     }
 
 }

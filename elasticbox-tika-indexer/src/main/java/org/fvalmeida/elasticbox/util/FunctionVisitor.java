@@ -25,10 +25,12 @@ public class FunctionVisitor extends SimpleFileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        if (attrs.isRegularFile()) {
+        if (attrs.isRegularFile() && file.toFile().canRead()) {
             log.debug("Invoke file: {}", file);
+            return pathFunction.apply(file);
+        } else {
+            return CONTINUE;
         }
-        return pathFunction.apply(file);
     }
 
     @Override

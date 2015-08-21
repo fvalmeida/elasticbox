@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by fvalmeida on 8/20/15.
@@ -26,6 +27,9 @@ import java.util.concurrent.Future;
 @Component
 @Slf4j
 public class Processor {
+
+    @Autowired
+    private AtomicInteger countFiles;
 
     @Autowired
     private Extractor extractor;
@@ -51,6 +55,7 @@ public class Processor {
                     }
                 }
             }
+            countFiles.incrementAndGet();
         } catch (Exception e) {
             log.error("File: {}\n{}", file.getAbsolutePath(), e);
         }

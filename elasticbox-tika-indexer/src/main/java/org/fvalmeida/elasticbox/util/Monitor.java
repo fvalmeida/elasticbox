@@ -2,6 +2,7 @@ package org.fvalmeida.elasticbox.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -13,19 +14,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class Monitor extends Thread {
 
+    @Autowired
+    @Qualifier("countProcessedFiles")
+    private AtomicInteger countProcessedFiles;
+
+    @Autowired
+    @Qualifier("countErrorFiles")
+    private AtomicInteger countErrorFiles;
+
+    private boolean running = true;
+    private int totalCountFiles;
+    private boolean calculating = true;
+
     public Monitor() {
         super("Monitor");
     }
 
-    @Autowired
-    private AtomicInteger countFiles;
-
-    private boolean running = true;
-    private int totalCountFiles;
-    private boolean show = false;
-
-    public Monitor setShow(boolean show) {
-        this.show = show;
+    public Monitor setCalculating(boolean calculating) {
+        this.calculating = calculating;
         return this;
     }
 
@@ -36,13 +42,13 @@ public class Monitor extends Thread {
     @Override
     public void run() {
         while (running) {
-            if (show) {
-                log.info(String.format(
-                        "\n\n" +
-                        "================================\n" +
-                        " Processed files: %s / %s\n" +
-                        "================================\n", countFiles, totalCountFiles));
-            }
+            log.info(String.format(
+                    "\n\n" +
+                            "========================================\n" +
+                            " Processed files: %s / %s\n" +
+                            " Error files: %s\n" +
+                            "========================================\n",
+                    countProcessedFiles.get(), calculating ? "calculating..." : totalCountFiles, countErrorFiles.get()));
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {

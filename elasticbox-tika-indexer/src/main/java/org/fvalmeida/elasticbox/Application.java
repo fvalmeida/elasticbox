@@ -8,6 +8,7 @@ import joptsimple.OptionSet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SerializationUtils;
+import org.fvalmeida.elasticbox.util.Monitor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -30,9 +31,6 @@ import java.util.stream.Stream;
 @EnableAsync
 @Slf4j
 public class Application {
-
-    public static final String ELASTICBOX_TIKA_INDEXER_CHECKSUM_FILE =
-            System.getProperty("user.home").concat(File.separator).concat(".elasticbox-tika-indexer-checksum");
 
     @Value("${thread-count:10}")
     private int threadCount;
@@ -147,28 +145,12 @@ public class Application {
     }
 
     @Bean
-    public ConcurrentSkipListSet<String> checkSumFileSet() throws IOException {
-        File checkSumFile = new File(ELASTICBOX_TIKA_INDEXER_CHECKSUM_FILE);
-        ConcurrentSkipListSet<String> checkSumFileSet = new ConcurrentSkipListSet<>();
-        if (checkSumFile.exists()) {
-            try (Stream<String> lines = Files.lines(checkSumFile.toPath())) {
-                checkSumFileSet = new ConcurrentSkipListSet<>(lines.collect(Collectors.toSet()));
-            } catch (Exception ex) {
-                log.warn("Trying load .elasticbox-tika-indexer-checksum with deserialization...");
-                try {
-                    checkSumFileSet = SerializationUtils.deserialize(Files.readAllBytes(checkSumFile.toPath()));
-                } catch (IOException ioe) {
-                    log.error(ioe.getMessage());
-                    log.warn(".elasticbox-tika-indexer-checksum was reset!");
-                }
-            }
-        }
-        FileUtils.writeLines(new File(Application.ELASTICBOX_TIKA_INDEXER_CHECKSUM_FILE), checkSumFileSet);
-        return checkSumFileSet;
+    public AtomicInteger countProcessedFiles() {
+        return new AtomicInteger();
     }
 
     @Bean
-    public AtomicInteger countFiles() {
+    public AtomicInteger countErrorFiles() {
         return new AtomicInteger();
     }
 

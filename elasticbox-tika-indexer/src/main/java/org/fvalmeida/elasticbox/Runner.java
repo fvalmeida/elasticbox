@@ -31,8 +31,6 @@ public class Runner implements CommandLineRunner {
     @Autowired
     private Monitor monitor;
 
-    private AtomicInteger totalCountFiles = new AtomicInteger();
-
     public void run(String... args) throws IOException, InterruptedException {
         try {
             List<Future<Void>> futures = new ArrayList<>();
@@ -40,25 +38,14 @@ public class Runner implements CommandLineRunner {
             monitor.start();
 
             for (String path : paths) {
-                log.info(String.format("Counting files from current start path (may take a long time): %s", path));
                 if (recursive) {
-                    Utils.list(Paths.get(path)).forEach(file -> totalCountFiles.incrementAndGet());
-                    monitor.setTotalCountFiles(totalCountFiles.get()).setShow(true);
+                    processor.countFiles(path, recursive);
                     Utils.list(Paths.get(path))
-//                    Files.walk(Paths.get(path))
-//                            .filter(Files::isRegularFile)
-//                            .sorted((o1, o2) -> LastModifiedFileComparator.LASTMODIFIED_COMPARATOR
-//                                    .compare(o1.toFile(), o2.toFile()))
                             .forEach(file -> futures.add(processor.process(file.toFile())));
                 } else {
-                    Utils.list(Paths.get(path), 1).forEach(file -> totalCountFiles.incrementAndGet());
-                    monitor.setTotalCountFiles(totalCountFiles.get()).setShow(true);
+                    processor.countFiles(path, recursive);
                     Utils.list(Paths.get(path), 1)
-//                    Arrays.asList(new File(path).listFiles(File::isFile))
-//                            .stream()
-//                            .sorted(LastModifiedFileComparator.LASTMODIFIED_COMPARATOR)
                             .forEach(file -> futures.add(processor.process(file.toFile())));
-
                 }
             }
 

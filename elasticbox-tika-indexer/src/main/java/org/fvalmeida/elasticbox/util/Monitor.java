@@ -1,8 +1,8 @@
 package org.fvalmeida.elasticbox.util;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,51 +14,43 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class Monitor extends Thread {
 
-    @Autowired
-    @Qualifier("countProcessedFiles")
-    private AtomicInteger countProcessedFiles;
+    @Getter
+    private AtomicInteger countProcessedFiles = new AtomicInteger();
+    @Getter
+    private AtomicInteger countErrorFiles = new AtomicInteger();
+    @Getter
+    private AtomicInteger totalCountFiles = new AtomicInteger();
 
-    @Autowired
-    @Qualifier("countErrorFiles")
-    private AtomicInteger countErrorFiles;
-
+    @Setter
     private boolean running = true;
-    private int totalCountFiles;
+    @Setter
     private boolean calculating = true;
 
     public Monitor() {
         super("Monitor");
     }
 
-    public Monitor setCalculating(boolean calculating) {
-        this.calculating = calculating;
-        return this;
-    }
-
-    public void setRunning(boolean running) {
-        this.running = running;
-    }
-
     @Override
     public void run() {
         while (running) {
-            log.info(String.format(
-                    "\n\n" +
-                            "========================================\n" +
-                            " Processed files: %s / %s\n" +
-                            " Error files: %s\n" +
-                            "========================================\n",
-                    countProcessedFiles.get(), calculating ? "calculating..." : totalCountFiles, countErrorFiles.get()));
+            print();
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        print();
     }
 
-    public Monitor setTotalCountFiles(int totalCountFiles) {
-        this.totalCountFiles = totalCountFiles;
-        return this;
+    private void print() {
+        log.info(String.format(
+                "\n\n" +
+                        "========================================\n" +
+                        " Processed files: %s / %s\n" +
+                        " Error files: %s\n" +
+                        "========================================\n",
+                countProcessedFiles.get(), calculating ? "calculating..." : totalCountFiles, countErrorFiles.get()));
     }
+
 }

@@ -1,19 +1,26 @@
 package org.fvalmeida.elasticbox;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import joptsimple.OptionSet;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.elasticsearch.client.Client;
+import org.fvalmeida.elasticbox.util.DirectoryStreamUtils;
 import org.fvalmeida.elasticbox.util.Monitor;
-import org.fvalmeida.elasticbox.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
@@ -33,19 +40,60 @@ public class Runner implements CommandLineRunner {
 
     public void run(String... args) throws IOException, InterruptedException {
         try {
-            List<Future<Void>> futures = new ArrayList<>();
-
             monitor.start();
 
+            OptionSet options = Application.getOptionParse().parse(args);
+            log.debug(String.format("Program arguments:\n%s",
+                    new GsonBuilder().setPrettyPrinting().create().toJson(options.asMap())));
+
+            List<Future<Void>> futures = new ArrayList<>();
             for (String path : paths) {
+                log.info("Indexing path: {}", path);
                 if (recursive) {
-                    processor.countFiles(path, recursive);
-                    Utils.list(Paths.get(path))
-                            .forEach(file -> futures.add(processor.process(file.toFile())));
+                    if (options.has("filter")) {
+                        String filter = String.valueOf(options.valueOf("filter"));
+                        log.info("Filter settings: {}", filter);
+                        processor.countFiles(new DirectoryStreamUtils.Container() {
+                            @Override
+                            public DirectoryStream<Path> stream() throws IOException {
+                                Path startPath = Paths.get(path);
+                                return DirectoryStreamUtils.filter(startPath, filter);
+                            }
+                        }, path);
+                        DirectoryStreamUtils.filter(Paths.get(path), filter)
+                                .forEach(file -> futures.add(processor.process(file.toFile())));
+                    } else {
+                        processor.countFiles(new DirectoryStreamUtils.Container() {
+                            @Override
+                            public DirectoryStream<Path> stream() throws IOException {
+                                return DirectoryStreamUtils.list(Paths.get(path));
+                            }
+                        }, path);
+                        DirectoryStreamUtils.list(Paths.get(path))
+                                .forEach(file -> futures.add(processor.process(file.toFile())));
+                    }
                 } else {
-                    processor.countFiles(path, recursive);
-                    Utils.list(Paths.get(path), 1)
-                            .forEach(file -> futures.add(processor.process(file.toFile())));
+                    if (options.has("filter")) {
+                        String filter = String.valueOf(options.valueOf("filter"));
+                        log.info("Filter settings: {}", filter);
+                        processor.countFiles(new DirectoryStreamUtils.Container() {
+                            @Override
+                            public DirectoryStream<Path> stream() throws IOException {
+                                return DirectoryStreamUtils.filter(Paths.get(path), filter, 1);
+                            }
+                        }, path);
+                        DirectoryStreamUtils.filter(Paths.get(path), filter, 1)
+                                .forEach(file -> futures.add(processor.process(file.toFile())));
+                    } else {
+                        processor.countFiles(new DirectoryStreamUtils.Container() {
+                            @Override
+                            public DirectoryStream<Path> stream() throws IOException {
+                                return DirectoryStreamUtils.list(Paths.get(path));
+                            }
+                        }, path);
+                        DirectoryStreamUtils.list(Paths.get(path), 1)
+                                .forEach(file -> futures.add(processor.process(file.toFile())));
+                    }
                 }
             }
 

@@ -5,15 +5,14 @@ import com.google.common.base.Function;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.EnumSet;
 import java.util.Objects;
 
 /**
  * Created by fvalmeida on 8/20/15.
  */
-public class Utils {
+public class DirectoryStreamUtils {
 
-    private Utils() {
+    private DirectoryStreamUtils() {
     }
 
     /**
@@ -29,29 +28,34 @@ public class Utils {
     }
 
     /**
-     * Returns a DirectoryStream that can iterate over files found recursively based on the glob pattern provided
+     * Returns a DirectoryStream that can iterate over files found recursively based on the syntaxAndPattern provided
+     * <p>
+     * <i>syntax:pattern</i> ("blob" or "regex" syntaxes)
      *
-     * @param startPath the Directory to start from
-     * @param pattern   the glob to match against files
+     * @param startPath        the Directory to start from
+     * @param syntaxAndPattern the syntaxAndPattern to match against files
      * @return DirectoryStream
      * @throws IOException
      */
-    public static DirectoryStream<Path> glob(Path startPath, String pattern) throws IOException {
+    public static DirectoryStream<Path> filter(Path startPath, String syntaxAndPattern) throws IOException {
         validate(startPath);
-        return new AsynchRecursiveDirectoryStream(startPath, buildGlobFilter(pattern));
+        return new AsynchRecursiveDirectoryStream(startPath, buildFilter(syntaxAndPattern));
     }
 
     /**
-     * Returns a DirectoryStream that can iterate over files found recursively based on the regex pattern provided
+     * Returns a DirectoryStream that can iterate over files found recursively based on the syntaxAndPattern provided
+     * <p>
+     * <i>syntax:pattern</i> ("blob" or "regex" syntaxes)
      *
-     * @param startPath the Directory to start from
-     * @param pattern   the glob to match against files
+     * @param startPath        the Directory to start from
+     * @param syntaxAndPattern the syntaxAndPattern to match against files
+     * @param maxDepth         controls how deep the hierarchy is navigated to (less than 0 means unlimited)
      * @return DirectoryStream
      * @throws IOException
      */
-    public static DirectoryStream<Path> regex(Path startPath, String pattern) throws IOException {
+    public static DirectoryStream<Path> filter(Path startPath, String syntaxAndPattern, Integer maxDepth) throws IOException {
         validate(startPath);
-        return new AsynchRecursiveDirectoryStream(startPath, buildRegexFilter(pattern));
+        return new AsynchRecursiveDirectoryStream(startPath, buildFilter(syntaxAndPattern), maxDepth);
     }
 
     /**
@@ -88,18 +92,11 @@ public class Utils {
         }
     }
 
-    private static DirectoryStream.Filter<Path> buildGlobFilter(String pattern) {
-        final PathMatcher pathMatcher = getPathMatcher("glob:" + pattern);
-        return pathMatcher::matches;
+    private static DirectoryStream.Filter<Path> buildFilter(String syntaxAndPattern) {
+        return FileSystems.getDefault().getPathMatcher(syntaxAndPattern)::matches;
     }
 
-    private static DirectoryStream.Filter<Path> buildRegexFilter(String pattern) {
-        final PathMatcher pathMatcher = getPathMatcher("regex:" + pattern);
-        return pathMatcher::matches;
+    public abstract static class Container {
+        public abstract DirectoryStream<Path> stream() throws IOException;
     }
-
-    private static PathMatcher getPathMatcher(String pattern) {
-        return FileSystems.getDefault().getPathMatcher(pattern);
-    }
-
 }

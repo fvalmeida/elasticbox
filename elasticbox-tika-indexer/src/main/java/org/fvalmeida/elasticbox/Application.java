@@ -6,26 +6,19 @@ import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SerializationUtils;
-import org.fvalmeida.elasticbox.util.Monitor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @SpringBootApplication
 @EnableAsync
@@ -38,21 +31,29 @@ public class Application {
     public static void main(String[] args) throws IOException {
         OptionParser parser = getOptionParse();
         parser.formatHelpWith(getHelpFormatter());
+        ConfigurableApplicationContext application = null;
         try {
             OptionSet options = parser.parse(args);
             if (options.has("?")) {
                 parser.printHelpOn(System.out);
             } else {
-                SpringApplication.run(Application.class, args);
+                application = SpringApplication.run(Application.class, args);
             }
         } catch (OptionException e) {
             log.error(e.getMessage());
             parser.printHelpOn(System.out);
+        } finally {
+            if (application != null) {
+                application.close();
+            }
         }
     }
 
     protected static OptionParser getOptionParse() {
         final OptionParser parser = new OptionParser();
+
+        // ignore unknown args (allow spring boot defaults)
+        parser.allowsUnrecognizedOptions();
 
         parser.acceptsAll(asList("?", "h", "help"), "Show the help");
 
@@ -68,6 +69,11 @@ public class Application {
                 .withValuesSeparatedBy(",")
                 .defaultsTo("current directory")
                 .describedAs("comma-separated paths");
+
+        parser.acceptsAll(asList("filter"), "A filter that may be used to match paths against the pattern\nSupports the \"glob\" and \"regex\" syntaxes")
+                .withRequiredArg()
+                .ofType(String.class)
+                .describedAs("syntax:pattern");
 
         parser.acceptsAll(asList("recursive"), "Index path recursively\n")
                 .withRequiredArg()
@@ -99,26 +105,29 @@ public class Application {
 
     private static HelpFormatter getHelpFormatter() {
         return options -> (
-                "Usage: java -jar elasticbox-tika-indexer.jar <options>           \n\n" +
-                        "Option                                                                 Description                     \n" +
-                        "------                                                                 -----------                     \n" +
-                        "-?, -h, --help                                                         Show the help                   \n" +
-                        "--index.name=<value>                                                   Elasticsearch index name        \n" +
-                        "                                                                        (default: elasticbox)          \n" +
-                        "--paths=<comma-separated paths>                                        Paths for index to Elasticsearch\n" +
-                        "                                                                        (default: current directory)   \n" +
-                        "--recursive=<true|false>                                               Index path recursively          \n" +
-                        "                                                                        (default: true)                \n" +
-                        "--spring.data.elasticsearch.cluster-nodes=<comma-separated nodes>      Elasticsearch cluster nodes     \n" +
-                        "                                                                        (default: localhost:9300)      \n" +
-                        "--thread-count=<number of threads>                                     Max number of threads           \n" +
-                        "                                                                        (default: 10)                  \n" +
-                        "--error.logging.file=<value>                                           Error logging file              \n" +
-                        "                                                                        (default: elasticbox.error.log)\n\n" +
-                        "Example:                                                           \n" +
+                "Usage: java -jar elasticbox-tika-indexer.jar <options>\n\n" +
+                        "   -?, -h, --help\n" +
+                        "      Show the help\n\n" +
+                        "   --index.name=<value>\n" +
+                        "      Elasticsearch index name (default: \"elasticbox\")\n\n" +
+                        "   --filter=<syntax:pattern>\n" +
+                        "      A filter that may be used to match paths against the pattern\n" +
+                        "      Supports the \"glob\" and \"regex\" syntaxes\n\n" +
+                        "   --paths=<comma-separated paths>\n" +
+                        "      Paths for index to Elasticsearch (default: \"current directory\")\n\n" +
+                        "   --recursive=<true|false>\n" +
+                        "       Index path recursively (default: true)\n\n" +
+                        "   --spring.data.elasticsearch.cluster-nodes=<comma-separated nodes>\n" +
+                        "       Elasticsearch cluster nodes (default: \"localhost:9300\")\n\n" +
+                        "   --thread-count=<number of threads>\n" +
+                        "      Max number of threads (default: 10)\n\n" +
+                        "   --error.logging.file=<value>\n" +
+                        "      Error logging file (default: \"elasticbox.error.log\")\n\n" +
+                        "Examples:\n" +
                         "   java -jar elasticbox-tika-indexer.jar\n" +
                         "   java -jar elasticbox-tika-indexer.jar --recursive=false\n" +
-                        "   java -jar elasticbox-tika-indexer.jar --paths=/Documents --index.name=documents\n\n"
+                        "   java -jar elasticbox-tika-indexer.jar --paths=/Documents --index.name=documents\n" +
+                        "   java -jar elasticbox-tika-indexer.jar --filter=glob:*.{pdf,doc}\n\n"
         );
     }
 
@@ -142,16 +151,6 @@ public class Application {
     public Executor processorExecutor() {
         return Executors.newFixedThreadPool(threadCount,
                 new ThreadFactoryBuilder().setNameFormat("Processor-%d").build());
-    }
-
-    @Bean
-    public AtomicInteger countProcessedFiles() {
-        return new AtomicInteger();
-    }
-
-    @Bean
-    public AtomicInteger countErrorFiles() {
-        return new AtomicInteger();
     }
 
 }

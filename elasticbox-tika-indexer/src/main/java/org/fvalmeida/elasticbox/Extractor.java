@@ -1,5 +1,6 @@
 package org.fvalmeida.elasticbox;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,12 +27,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.zip.DataFormatException;
 
 @Component
+@Slf4j
 public class Extractor {
 
     @Async("parseExecutor")
-    public Future<List<Pair<Metadata, String>>> parse(File file) throws TikaException, IOException, SAXException {
+    public Future<List<Pair<Metadata, String>>> parse(File file) throws TikaException, SAXException, IOException, DataFormatException {
         List<Pair<Metadata, String>> pairs = new ArrayList<>();
         List<Metadata> metadatas = getMetadata(file);
         if (metadatas.size() > 1) {
@@ -54,15 +57,15 @@ public class Extractor {
         return new AsyncResult<>(pairs);
     }
 
-    private Metadata addPath(Metadata metadata, File file) {
-        Path path = Paths.get(file.getAbsolutePath());
+    private Metadata addPath(Metadata metadata, File file) throws IOException {
+        Path path = Paths.get(file.getCanonicalPath());
         FileSystemView fileSystemView = FileSystemView.getFileSystemView();
-        metadata.add("resourceRoot", fileSystemView.getSystemDisplayName(Paths.get(file.getAbsolutePath()).getRoot().toFile()));
+        metadata.add("resourceRoot", fileSystemView.getSystemDisplayName(path.getRoot().toFile()));
         metadata.add("resourcePath", path.getParent().toString());
         return metadata;
     }
 
-    private List<Metadata> getMetadata(File file) throws IOException, SAXException, TikaException {
+    private List<Metadata> getMetadata(File file) throws IOException, SAXException, TikaException, DataFormatException {
         Parser p = new AutoDetectParser();
         ContentHandlerFactory factory = new BasicContentHandlerFactory(BasicContentHandlerFactory.HANDLER_TYPE.TEXT, -1);
         RecursiveParserWrapper wrapper = new RecursiveParserWrapper(p, factory);

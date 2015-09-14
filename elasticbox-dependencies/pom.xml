@@ -70,7 +70,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin.bat">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="plugin.bat">
                                             <arg value="-i"/>
                                             <arg value="mobz/elasticsearch-head"/>
                                         </exec>
@@ -85,7 +85,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin.bat">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="plugin.bat">
                                             <arg value="-i"/>
                                             <arg value="royrusso/elasticsearch-HQ"/>
                                         </exec>
@@ -100,7 +100,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin.bat">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="plugin.bat">
                                             <arg value="-i"/>
                                             <arg value="lmenezes/elasticsearch-kopf"/>
                                         </exec>
@@ -115,7 +115,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin.bat">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="plugin.bat">
                                             <arg value="-i"/>
                                             <arg value="lukas-vlcek/bigdesk"/>
                                         </exec>
@@ -186,7 +186,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="plugin">
                                             <arg value="-i"/>
                                             <arg value="mobz/elasticsearch-head"/>
                                         </exec>
@@ -201,7 +201,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="plugin">
                                             <arg value="-i"/>
                                             <arg value="royrusso/elasticsearch-HQ"/>
                                         </exec>
@@ -216,7 +216,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="plugin">
                                             <arg value="-i"/>
                                             <arg value="lmenezes/elasticsearch-kopf"/>
                                         </exec>
@@ -231,7 +231,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="plugin">
                                             <arg value="-i"/>
                                             <arg value="lukas-vlcek/bigdesk"/>
                                         </exec>

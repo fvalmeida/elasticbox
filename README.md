@@ -6,7 +6,7 @@ Elasticbox is a simple bare bone app for test TIKA and Elasticsearch features.
 Requisites
 ------------
 
-- [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+- [JDK 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 - [Git](https://git-scm.com/download/): follow installation instructions from [site](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 - [Maven](https://maven.apache.org/download.cgi): follow installation instructions from [site](https://maven.apache.org/install.html).
 

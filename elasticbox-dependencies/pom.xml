@@ -87,7 +87,9 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin.bat">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="cmd">
+                                            <arg value="/C"/>
+                                            <arg value="plugin.bat"/>
                                             <arg value="-i"/>
                                             <arg value="royrusso/elasticsearch-HQ"/>
                                         </exec>

@@ -69,27 +69,36 @@ Running
     > Usage: 
     
     ```
-    Usage: java -jar elasticbox-tika-indexer.jar <options>           
+    java -jar elasticbox-tika-indexer.jar <options>
     
-    Option                                                                 Description                     
-    ------                                                                 -----------                     
-    -?, -h, --help                                                         Show the help                   
-    --index.name=<value>                                                   Elasticsearch index name        
-                                                                            (default: elasticbox)          
-    --paths=<comma-separated paths>                                        Paths for index to Elasticsearch
-                                                                            (default: current directory)   
-    --recursive=<true|false>                                               Index path recursively          
-                                                                            (default: true)                
-    --spring.data.elasticsearch.cluster-nodes=<comma-separated nodes>      Elasticsearch cluster nodes     
-                                                                            (default: localhost:9300)      
-    --thread-count=<number of threads>                                     Max number of threads           
-                                                                            (default: 10)                  
-    --error.logging.file=<value>                                           Error logging file              
-                                                                            (default: elasticbox.error.log)
+       -?, -h, --help
+          Show the help
     
-    Example:                                                           
+       --index.name=<value>
+          Elasticsearch index name (default: "elasticbox")
+    
+       --filter=<syntax:pattern>
+          A filter that may be used to match paths against the pattern
+          Supports the "glob" and "regex" syntaxes
+    
+       --paths=<comma-separated paths>
+          Paths for index to Elasticsearch (default: "current directory")
+    
+       --recursive=<true|false>
+           Index path recursively (default: true)
+    
+       --spring.data.elasticsearch.cluster-nodes=<comma-separated nodes>
+           Elasticsearch cluster nodes (default: "localhost:9300")
+    
+       --thread-count=<number of threads>
+          Max number of threads (default: 10)
+    
+       --error.logging.file=<value>
+          Error logging file (default: "elasticbox.error.log")
+    
+    Examples:
        java -jar elasticbox-tika-indexer.jar
        java -jar elasticbox-tika-indexer.jar --recursive=false
        java -jar elasticbox-tika-indexer.jar --paths=/Documents --index.name=documents
-
+       java -jar elasticbox-tika-indexer.jar --filter=glob:*.{pdf,doc}
    ```  

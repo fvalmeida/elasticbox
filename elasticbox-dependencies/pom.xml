@@ -70,7 +70,9 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin.bat">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="cmd">
+                                            <arg value="/C"/>
+                                            <arg value="plugin.bat"/>
                                             <arg value="-i"/>
                                             <arg value="mobz/elasticsearch-head"/>
                                         </exec>
@@ -85,7 +87,9 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin.bat">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="cmd">
+                                            <arg value="/C"/>
+                                            <arg value="plugin.bat"/>
                                             <arg value="-i"/>
                                             <arg value="royrusso/elasticsearch-HQ"/>
                                         </exec>
@@ -100,7 +104,9 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin.bat">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="cmd">
+                                            <arg value="/C"/>
+                                            <arg value="plugin.bat"/>
                                             <arg value="-i"/>
                                             <arg value="lmenezes/elasticsearch-kopf"/>
                                         </exec>
@@ -115,9 +121,62 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin.bat">
+                                        <exec dir="${elasticsearch.dir}/bin" executable="cmd">
+                                            <arg value="/C"/>
+                                            <arg value="plugin.bat"/>
                                             <arg value="-i"/>
                                             <arg value="lukas-vlcek/bigdesk"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>elasticsearch-gui</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <exec dir="${elasticsearch.dir}/bin" executable="cmd">
+                                            <arg value="/C"/>
+                                            <arg value="plugin.bat"/>
+                                            <arg value="-i"/>
+                                            <arg value="jettro/elasticsearch-gui"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>elasticsearch-inquisitor</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <exec dir="${elasticsearch.dir}/bin" executable="cmd">
+                                            <arg value="/C"/>
+                                            <arg value="plugin.bat"/>
+                                            <arg value="-i"/>
+                                            <arg value="polyfractal/elasticsearch-inquisitor"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>curiosity</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <exec dir="${elasticsearch.dir}/bin" executable="cmd">
+                                            <arg value="/C"/>
+                                            <arg value="plugin.bat"/>
+                                            <arg value="-i"/>
+                                            <arg value="pagesjaunes/curiosity"/>
                                         </exec>
                                     </target>
                                 </configuration>
@@ -234,6 +293,51 @@
                                         <exec dir="${elasticsearch.dir}" executable="bin/plugin">
                                             <arg value="-i"/>
                                             <arg value="lukas-vlcek/bigdesk"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>elasticsearch-gui</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin">
+                                            <arg value="-i"/>
+                                            <arg value="jettro/elasticsearch-gui"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>elasticsearch-inquisitor</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin">
+                                            <arg value="-i"/>
+                                            <arg value="polyfractal/elasticsearch-inquisitor"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>curiosity</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <exec dir="${elasticsearch.dir}" executable="bin/plugin">
+                                            <arg value="-i"/>
+                                            <arg value="pagesjaunes/curiosity"/>
                                         </exec>
                                     </target>
                                 </configuration>

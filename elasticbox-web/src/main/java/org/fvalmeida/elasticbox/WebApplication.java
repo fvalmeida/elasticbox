@@ -26,9 +26,19 @@ public class WebApplication {
         return "redirect:/ESClient/index.html";
     }
 
-    @RequestMapping("/kopf")
-    public String kopf() {
-        return "redirect:/kopf/index.html?location=http://localhost:9200";
+    @RequestMapping("/facetview")
+    public String facetview() {
+        return "redirect:/facetview/index.html";
+    }
+
+    @RequestMapping("/facetview2")
+    public String facetview2() {
+        return "redirect:/facetview2/fv_example.html";
+    }
+
+    @RequestMapping("/nutch")
+    public String nutch() {
+        return "redirect:/nutch/index.html";
     }
 
 }

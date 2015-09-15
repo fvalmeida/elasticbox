@@ -1,6 +1,6 @@
 package org.fvalmeida.elasticbox;
 
-import org.fvalmeida.elasticbox.util.Utils;
+import org.fvalmeida.elasticbox.util.DirectoryStreamUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -18,14 +18,14 @@ public class CountFilesTest {
     @Test
     public void recursive() throws IOException {
         AtomicInteger totalCountFiles = new AtomicInteger();
-        Utils.list(Paths.get(".")).forEach(file -> totalCountFiles.incrementAndGet());
+        DirectoryStreamUtils.list(Paths.get(".")).forEach(file -> totalCountFiles.incrementAndGet());
         System.out.println("Total files: " + totalCountFiles.get());
     }
 
     @Test
     public void nonRecursive() throws IOException {
         AtomicInteger totalCountFiles = new AtomicInteger();
-        Utils.list(Paths.get("."), 1).forEach(file -> totalCountFiles.incrementAndGet());
+        DirectoryStreamUtils.list(Paths.get("."), 1).forEach(file -> totalCountFiles.incrementAndGet());
         System.out.println("Total files: " + totalCountFiles.get());
     }
 
@@ -33,7 +33,7 @@ public class CountFilesTest {
     public void recursive2Levels() throws IOException {
         // just 2 levels
         AtomicInteger totalCountFiles = new AtomicInteger();
-        Utils.list(Paths.get("."), 2).forEach(file -> totalCountFiles.incrementAndGet());
+        DirectoryStreamUtils.list(Paths.get("."), 2).forEach(file -> totalCountFiles.incrementAndGet());
         System.out.println("Total files: " + totalCountFiles.get());
     }
 

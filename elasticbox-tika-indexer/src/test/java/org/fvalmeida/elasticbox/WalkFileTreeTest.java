@@ -1,7 +1,7 @@
 package org.fvalmeida.elasticbox;
 
 import lombok.extern.slf4j.Slf4j;
-import org.fvalmeida.elasticbox.util.Utils;
+import org.fvalmeida.elasticbox.util.DirectoryStreamUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -23,19 +23,19 @@ public class WalkFileTreeTest {
 
     @Test
     public void nonRecursive() throws IOException {
-        Utils.list(Paths.get("."), 1).forEach(path -> process(path.toFile()));
+        DirectoryStreamUtils.list(Paths.get("."), 1).forEach(path -> process(path.toFile()));
     }
 
     @Test
     public void recursive2Levels() throws IOException {
         // just 2 levels
-        Utils.list(Paths.get("."), 2).forEach(path -> process(path.toFile()));
+        DirectoryStreamUtils.list(Paths.get("."), 2).forEach(path -> process(path.toFile()));
     }
 
     @Test
     public void recursive() throws IOException {
         // all levels
-        Utils.list(Paths.get(".")).forEach(path -> process(path.toFile()));
+        DirectoryStreamUtils.list(Paths.get(".")).forEach(path -> process(path.toFile()));
     }
 
 //    @Test

@@ -18,12 +18,17 @@ Technology stack
 + **Main**
     
     - [ElasticSearch](https://www.elastic.co/downloads/elasticsearch)
+    - [Kibana](https://www.elastic.co/downloads/kibana)
+    - [Apache Tika](https://tika.apache.org/)
+    - [Spring Boot](http://projects.spring.io/spring-boot/)
+    
++ **Tools**
+
     - [elasticsearch-head](http://mobz.github.io/elasticsearch-head/)
     - [ElasticHQ](http://www.elastichq.org/support_plugin.html) 
     - [elasticsearch-kopf](https://github.com/lmenezes/elasticsearch-kopf/) 
     - [bigdesk](http://bigdesk.org/)
-    - [Kibana](https://www.elastic.co/downloads/kibana)
-    
+        
 + **Others**
     
     - [Elasticsearch.Net](http://nest.azurewebsites.net/)
@@ -64,26 +69,27 @@ Running
     > Usage: 
     
     ```
-    java -jar elasticbox-tika-indexer.jar <options>           
-      
-      Option                                                                 Description                     
-      ------                                                                 -----------                     
-      -?, -h, --help                                                         Show the help                   
-      --index.name=<value>                                                   Elasticsearch index name        
-                                                                              (default: elasticbox)          
-      --paths=<comma-separated paths>                                        Paths for index to Elasticsearch
-                                                                              (default: current directory)   
-      --recursive=<true|false>                                               Index path recursively          
-                                                                              (default: true)                
-      --spring.data.elasticsearch.cluster-nodes=<comma-separated nodes>      Elasticsearch cluster nodes     
-                                                                              (default: localhost:9300)      
-      --thread-count=<number of threads>                                     Max number of threads           
-                                                                              (default: 10)                  
-      --error.logging.file=<value>                                           Error logging file              
-                                                                              (default: elasticbox.error.log)
-      
-      Example:                                                           
-         java -jar elasticbox-tika-indexer.jar
-         java -jar elasticbox-tika-indexer.jar --recursive=false
-         java -jar elasticbox-tika-indexer.jar --paths=/Documents --index.name=documents
+    Usage: java -jar elasticbox-tika-indexer.jar <options>           
+    
+    Option                                                                 Description                     
+    ------                                                                 -----------                     
+    -?, -h, --help                                                         Show the help                   
+    --index.name=<value>                                                   Elasticsearch index name        
+                                                                            (default: elasticbox)          
+    --paths=<comma-separated paths>                                        Paths for index to Elasticsearch
+                                                                            (default: current directory)   
+    --recursive=<true|false>                                               Index path recursively          
+                                                                            (default: true)                
+    --spring.data.elasticsearch.cluster-nodes=<comma-separated nodes>      Elasticsearch cluster nodes     
+                                                                            (default: localhost:9300)      
+    --thread-count=<number of threads>                                     Max number of threads           
+                                                                            (default: 10)                  
+    --error.logging.file=<value>                                           Error logging file              
+                                                                            (default: elasticbox.error.log)
+    
+    Example:                                                           
+       java -jar elasticbox-tika-indexer.jar
+       java -jar elasticbox-tika-indexer.jar --recursive=false
+       java -jar elasticbox-tika-indexer.jar --paths=/Documents --index.name=documents
+
    ```  
